@@ -3,6 +3,8 @@ window.MOCK = {
   currentCompany: '晓月传媒',
 
   companyList: ['晓月传媒', '星辰影视', '极光文化', '烈焰工作室', '云端影业', '星河制作'],
+
+  dramas: [
     { id: 'd1', name: '谁抢机缘谁赢麻，我竟是隐藏BOSS', videoUrl: 'https://example.com/video1', type: 'AI剧', copyrightType: '定制剧', company: '晓月传媒', highlightDescription: '卡1：第11集，卡2：第25集', timeliness: 'T-7', status: '已完成', auditResult: 'S级', submitterId: 'u1', submitterName: '张三', createdAt: '2026-05-10 09:30:00', updatedAt: '2026-05-12 14:20:00',
       auditHistory: [
         { time: '2026-05-11 10:00:00', result: 'A+级', comment: '剧情节奏紧凑，角色塑造立体，但部分特效还有提升空间。' },
