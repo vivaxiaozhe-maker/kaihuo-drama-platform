@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>开火短剧开放平台 - 剧集详情</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/data.js"></script>
+</head>
+<body>
+  <header class="header">
+    <canvas id="headerCanvas" class="header-bg"></canvas>
+    <div class="header-left">
+      <span class="header-logo">&#128293;</span>
+      <span class="header-title">开火短剧开放平台</span>
+    </div>
+    <div class="header-right">
+      <span id="roleTag" class="role-tag">提报人</span>
+      <span id="userName" class="user-name">张三</span>
+      <button class="btn-logout" onclick="logout()">退出</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sider">
+      <ul class="sider-menu">
+        <li><a href="submitter.html">&#127909; 我的提报</a></li>
+        <li><a href="submitter.html?tab=upload">&#128316; 上传新剧</a></li>
+        <li><a href="auditor.html">&#128270; 审核后台</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div id="pageHeader"></div>
+
+      <div class="detail-layout">
+        <!-- 左侧交付需求 -->
+        <div class="detail-left">
+          <div class="card" style="position:sticky; top:80px">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px">
+              <h3 style="font-size:16px; color:var(--neon-cyan)">&#128196; 交付需求说明</h3>
+              <span class="tag-result" style="background:rgba(232,62,140,0.15); color:var(--neon-pink); border:1px solid rgba(232,62,140,0.3)">A+ 至 S+</span>
+            </div>
+
+            <div style="margin-bottom:20px">
+              <h4 style="color:var(--neon-yellow); margin-bottom:8px">&#11088; 特殊要求（A+ 至 S+ 评级）</h4>
+              <div style="background:rgba(255,215,0,0.05); padding:12px; border-radius:8px; font-size:13px; line-height:1.8; border:1px solid rgba(255,215,0,0.1)">
+                需额外交付一个网盘链接，包含：<br>
+                - 30%（10-15集）带字幕分集成片<br>
+                - 5条高光预告片<br>
+                - 1:1海报
+              </div>
+            </div>
+
+            <div style="margin-bottom:20px">
+              <h4 style="margin-bottom:8px; color:var(--text-primary)">&#128196; 交付版本</h4>
+              <table class="table" style="font-size:13px">
+                <thead><tr><th>类型</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td>完整版MP4</td><td>有字幕,有背景音乐,无片头片尾整集</td></tr>
+                  <tr><td>完整版本SRT文件</td><td>无字幕版本</td></tr>
+                  <tr><td>分集版本MP4</td><td>有字幕,有背景音乐,分集版本</td></tr>
+                  <tr><td>分集版本SRT文件</td><td>分集版本字幕文件</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="margin-bottom:20px">
+              <h4 style="margin-bottom:8px; color:var(--text-primary)">&#8505; 物料要求</h4>
+              <table class="table" style="font-size:13px">
+                <thead><tr><th style="width:80px">物料</th><th>内容</th></tr></thead>
+                <tbody>
+                  <tr><td>简介</td><td>长版简介200-300字 + 长版简介500-1000字（Word文档）</td></tr>
+                  <tr><td>制作信息</td><td>剧名,题材,频道,导演（真名+笔名）,导演性别,制片人（真名+笔名）,制片人性别,编剧（真名+笔名）,编剧性别,角色姓名(女主/男主/女配/男配),角色介绍20字以上,剧集集数/总时间,平均单集时长,剧集制作成本,制作机构,剧集推荐文案(高光剧情描述),推荐首次付费集数,推荐语（12字以内）</td></tr>
+                  <tr><td>宣传图/封面图</td><td>封面：尺寸9:16和7:10和2:3，大小不超过5M；女主/男主/女配/男配——角色照片，大小限制在200K-5M</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div>
+              <h4 style="margin-bottom:8px; color:var(--text-primary)">&#127909; 真人/原创额外素材</h4>
+              <table class="table" style="font-size:13px">
+                <thead><tr><th style="width:100px">素材</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td>宣传素材</td><td>尽量psd版本。剧情回顾:关键剧情创意剪辑，有主题延展和剧情重编的视频作品(剧情主题/事件主题/场景主题/情绪主题等)。剧情解析：关键剧情深度解析,有深度延展和剧情解读的视频内容(如剧情解读人物解读)</td></tr>
+                  <tr><td>工程文件（4张）或现场拍摄图（1张）二选一</td><td>现场拍摄图：1张带有剧组/剧名横幅的开机截图，若无横幅提供其他真实拍摄图均可。工程文件：4张带有制作分轨、剪辑点的工程文件截图</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧素材列表 -->
+        <div class="detail-right">
+          <div class="card">
+            <h3 style="margin-bottom:16px; color:var(--neon-cyan)">素材列表（<span id="materialCount">0</span>）</h3>
+            <div id="materialSection"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="uploadModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="color:var(--neon-cyan)">上传素材</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="upload-area" onclick="alert('演示模式：文件上传功能仅作展示')">
+          <div style="font-size:40px; color:var(--neon-cyan); margin-bottom:12px; text-shadow:0 0 20px rgba(0,240,255,0.4)">&#128230;</div>
+          <div>点击或拖拽文件到此处</div>
+          <div style="color:var(--text-secondary); font-size:12px; margin-top:6px">支持图片、视频、文档格式</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="alert('演示模式：上传成功'); closeModal();">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var canvas = document.getElementById('headerCanvas');
+      var ctx = canvas.getContext('2d');
+      var particles = [];
+      function resize() { canvas.width = canvas.parentElement.offsetWidth; canvas.height = canvas.parentElement.offsetHeight; }
+      resize(); window.addEventListener('resize', resize);
+      for (var i = 0; i < 40; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5, radius: Math.random() * 1.5 + 0.5 });
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i]; p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 240, 255, 0.4)'; ctx.fill();
+          for (var j = i + 1; j < particles.length; j++) {
+            var p2 = particles[j]; var dx = p.x - p2.x, dy = p.y - p2.y; var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 100) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.strokeStyle = 'rgba(0, 240, 255, ' + (0.2 * (1 - dist / 100)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+
+    var user = window.MOCK.getUser();
+    if (!user) { window.location.href = 'index.html'; }
+    else {
+      document.getElementById('roleTag').textContent = user.role === 'auditor' ? '审核人' : '提报人';
+      document.getElementById('roleTag').className = 'role-tag' + (user.role === 'auditor' ? ' auditor' : '');
+      document.getElementById('userName').textContent = user.displayName;
+    }
+    function logout() { window.MOCK.logout(); window.location.href = 'index.html'; }
+
+    var id = window.utils.getParam('id');
+    var drama = window.MOCK.dramas.find(function(d) { return d.id === id; });
+    if (!drama) {
+      document.querySelector('.main-content').innerHTML = '<div class="empty">剧集不存在</div>';
+    } else {
+      var typeColor = drama.type === '真人' ? '#4a90e2' : 'var(--neon-pink)';
+      var headerHtml = '<h1 class="page-title">' + drama.name + '</h1>' +
+        '<div style="margin-bottom:24px">' +
+          '<span class="tag-result" style="background:' + typeColor + '22;color:' + typeColor + ';border:1px solid ' + typeColor + '55;margin-right:8px">' + drama.type + '</span>' +
+          '<span class="tag-result" style="background:rgba(0,240,255,0.08);color:var(--neon-cyan);border:1px solid rgba(0,240,255,0.2);margin-right:8px">' + drama.copyrightType + '</span>' +
+          '<span class="tag-result" style="background:rgba(148,163,184,0.1);color:var(--text-secondary);border:1px solid rgba(148,163,184,0.2)">' + drama.timeliness + '</span>' +
+          (drama.auditResult ? ' <span class="tag-result" style="background:' + window.utils.resultColor(drama.auditResult) + '22;color:' + window.utils.resultColor(drama.auditResult) + ';border:1px solid ' + window.utils.resultColor(drama.auditResult) + '55">' + drama.auditResult + '</span>' : '') +
+        '</div>';
+      document.getElementById('pageHeader').innerHTML = headerHtml;
+    }
+
+    var materials = window.MOCK.materials[id] || [];
+    document.getElementById('materialCount').textContent = materials.length;
+
+    var section = document.getElementById('materialSection');
+    if (materials.length === 0) {
+      section.innerHTML = '<div class="empty">暂无素材<br><br><button class="btn btn-outline-pink" onclick="openModal()">&#43; 上传素材</button></div>';
+    } else {
+      section.innerHTML = '<div style="margin-bottom:16px; text-align:right"><button class="btn btn-primary" onclick="openModal()">&#43; 上传素材</button></div>' +
+        '<div class="material-grid">' + materials.map(function(m) {
+          var icon = m.type === '图片' ? '&#128444;' : m.type === '视频' ? '&#127909;' : '&#128196;';
+          var bg = m.type === '图片' ? 'rgba(0,240,255,0.05)' : 'rgba(26,26,46,0.8)';
+          var color = m.type === '图片' ? 'var(--neon-cyan)' : 'var(--neon-pink)';
+          return '<div class="material-card">' +
+            '<div class="material-thumb" style="background:' + bg + ';color:' + color + ';text-shadow:0 0 20px ' + color + '">' + icon + '</div>' +
+            '<div class="material-info">' +
+              '<div style="font-weight:500;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + m.name + '</div>' +
+              '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">' + m.createdAt + ' &middot; ' + window.utils.formatSize(m.size) + '</div>' +
+              '<button class="btn btn-sm">&#128229;</button> <button class="btn btn-sm" style="color:var(--neon-red);border-color:rgba(255,56,96,0.3);background:rgba(255,56,96,0.05)" onclick="deleteMaterial(this)">&#128465;</button>' +
+            '</div></div>';
+        }).join('') + '</div>';
+    }
+
+    function openModal() { document.getElementById('uploadModal').classList.add('active'); }
+    function closeModal() { document.getElementById('uploadModal').classList.remove('active'); }
+    function deleteMaterial(btn) {
+      if (confirm('确定要删除该素材吗？')) { btn.closest('.material-card').remove(); }
+    }
+  </script>
+</body>
+</html>

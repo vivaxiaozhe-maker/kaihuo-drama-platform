@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>开火短剧开放平台 - 登录</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/data.js"></script>
+</head>
+<body>
+  <div class="login-page">
+    <canvas id="loginCanvas" class="login-bg"></canvas>
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">&#128293;</div>
+        <h1 style="font-size: 24px; margin-bottom: 4px; color: var(--text-primary);">开火短剧开放平台</h1>
+        <p style="color: var(--text-secondary); font-size: 14px;">合作方内容提报与审核系统</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input type="text" id="username" class="form-input" placeholder="请输入用户名" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" id="password" class="form-input" placeholder="请输入密码" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">角色</label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="role" value="submitter" checked>
+              <span>提报人</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="role" value="auditor">
+              <span>审核人</span>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-gradient" style="width: 100%; height: 46px; font-size: 16px; margin-top: 8px; border-radius: 10px;">
+          登录
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // 登录页粒子背景
+    (function() {
+      var canvas = document.getElementById('loginCanvas');
+      var ctx = canvas.getContext('2d');
+      var particles = [];
+      var particleCount = 80;
+      var connectionDistance = 150;
+      var mouseX = 0, mouseY = 0;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      function createParticle() {
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          radius: Math.random() * 2 + 1,
+          color: Math.random() > 0.5 ? 'rgba(0, 240, 255,' : 'rgba(232, 62, 140,'
+        };
+      }
+
+      for (var i = 0; i < particleCount; i++) {
+        particles.push(createParticle());
+      }
+
+      document.addEventListener('mousemove', function(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color + '0.6)';
+          ctx.fill();
+
+          // 鼠标交互
+          var dx = mouseX - p.x;
+          var dy = mouseY - p.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 200) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(mouseX, mouseY);
+            ctx.strokeStyle = p.color + (0.3 * (1 - dist / 200)) + ')';
+            ctx.stroke();
+          }
+
+          // 粒子连线
+          for (var j = i + 1; j < particles.length; j++) {
+            var p2 = particles[j];
+            var ddx = p.x - p2.x;
+            var ddy = p.y - p2.y;
+            var ddist = Math.sqrt(ddx * ddx + ddy * ddy);
+            if (ddist < connectionDistance) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = 'rgba(0, 240, 255,' + (0.15 * (1 - ddist / connectionDistance)) + ')';
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var username = document.getElementById('username').value;
+      var password = document.getElementById('password').value;
+      var role = document.querySelector('input[name="role"]:checked').value;
+      window.MOCK.login(username, password, role);
+      if (role === 'auditor') {
+        window.location.href = 'auditor.html';
+      } else {
+        window.location.href = 'submitter.html';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>开火短剧开放平台 - 审核后台</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/data.js"></script>
+</head>
+<body>
+  <header class="header">
+    <canvas id="headerCanvas" class="header-bg"></canvas>
+    <div class="header-left">
+      <span class="header-logo">&#128293;</span>
+      <span class="header-title">开火短剧开放平台</span>
+    </div>
+    <div class="header-right">
+      <span id="roleTag" class="role-tag auditor">审核人</span>
+      <span id="userName" class="user-name">李审核</span>
+      <button class="btn-logout" onclick="logout()">退出</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sider">
+      <ul class="sider-menu">
+        <li><a href="submitter.html">&#127909; 我的提报</a></li>
+        <li><a href="submitter.html?tab=upload">&#128316; 上传新剧</a></li>
+        <li><a href="auditor.html" class="active">&#128270; 审核后台</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <h1 class="page-title">审核后台</h1>
+      <p class="page-subtitle">短剧内容审核与评级管理</p>
+
+      <div class="card">
+        <div class="tab-bar">
+          <div class="tab-item active" onclick="switchTab('pending')">&#128270; 待审核列表（<span id="pendingCount" style="color:var(--neon-cyan)">0</span>）</div>
+          <div class="tab-item" onclick="switchTab('reviewed')">&#128340; 已审核记录（<span id="reviewedCount" style="color:var(--neon-green)">0</span>）</div>
+        </div>
+
+        <!-- 待审核 -->
+        <div id="panel-pending" class="tab-panel active">
+          <table class="table" id="pendingTable">
+            <thead>
+              <tr><th>剧名</th><th style="width:80px">类型</th><th style="width:90px">版权类型</th><th style="width:100px">提报人</th><th style="width:160px">上传日期</th><th style="width:100px">操作</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="pendingEmpty" class="empty" style="display:none">暂无待审核剧集</div>
+        </div>
+
+        <!-- 已审核 -->
+        <div id="panel-reviewed" class="tab-panel">
+          <div style="display:flex; gap:12px; margin-bottom:16px">
+            <select id="filterResult" class="select" style="width:140px" onchange="renderReviewed()">
+              <option value="all">全部评级</option>
+              <option value="S级">S级</option>
+              <option value="A+级">A+级</option>
+              <option value="A级">A级</option>
+              <option value="B级">B级</option>
+              <option value="不通过">不通过</option>
+            </select>
+            <select id="filterType" class="select" style="width:120px" onchange="renderReviewed()">
+              <option value="all">全部类型</option>
+              <option value="真人">真人</option>
+              <option value="AI剧">AI剧</option>
+            </select>
+          </div>
+          <table class="table" id="reviewedTable">
+            <thead>
+              <tr><th>剧名</th><th style="width:80px">类型</th><th style="width:90px">版权类型</th><th style="width:100px">提报人</th><th style="width:100px">审核结果</th><th style="width:160px">上传日期</th><th style="width:120px">操作</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="reviewedEmpty" class="empty" style="display:none">暂无已审核记录</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 审核弹窗 -->
+  <div class="modal-overlay" id="auditModal">
+    <div class="modal" style="max-width:720px">
+      <div class="modal-header">
+        <h3 style="color:var(--neon-cyan)">剧集审核</h3>
+        <button class="modal-close" onclick="closeAuditModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="auditBody"></div>
+    </div>
+  </div>
+
+  <!-- 审核详情/修改弹窗 -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal" style="max-width:720px">
+      <div class="modal-header">
+        <h3 style="color:var(--neon-cyan)">审核详情</h3>
+        <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var canvas = document.getElementById('headerCanvas');
+      var ctx = canvas.getContext('2d');
+      var particles = [];
+      function resize() { canvas.width = canvas.parentElement.offsetWidth; canvas.height = canvas.parentElement.offsetHeight; }
+      resize(); window.addEventListener('resize', resize);
+      for (var i = 0; i < 40; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5, radius: Math.random() * 1.5 + 0.5 });
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i]; p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 240, 255, 0.4)'; ctx.fill();
+          for (var j = i + 1; j < particles.length; j++) {
+            var p2 = particles[j]; var dx = p.x - p2.x, dy = p.y - p2.y; var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 100) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.strokeStyle = 'rgba(0, 240, 255, ' + (0.2 * (1 - dist / 100)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+
+    var user = window.MOCK.getUser();
+    if (!user) { window.location.href = 'index.html'; }
+    else {
+      document.getElementById('roleTag').textContent = user.role === 'auditor' ? '审核人' : '提报人';
+      document.getElementById('roleTag').className = 'role-tag' + (user.role === 'auditor' ? ' auditor' : '');
+      document.getElementById('userName').textContent = user.displayName;
+    }
+    function logout() { window.MOCK.logout(); window.location.href = 'index.html'; }
+
+    var dramas = window.MOCK.dramas;
+    var currentAuditId = null;
+    var resultOptions = ['S级', 'A+级', 'A级', 'B级', '不通过'];
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-item').forEach(function(el, idx) {
+        el.classList.toggle('active', (tab === 'pending' && idx === 0) || (tab === 'reviewed' && idx === 1));
+      });
+      document.querySelectorAll('.tab-panel').forEach(function(el) { el.classList.remove('active'); });
+      document.getElementById('panel-' + tab).classList.add('active');
+    }
+
+    function renderPending() {
+      var list = dramas.filter(function(d) { return d.status === '待审核' || d.status === '审核中'; });
+      document.getElementById('pendingCount').textContent = list.length;
+      var tbody = document.querySelector('#pendingTable tbody');
+      var empty = document.getElementById('pendingEmpty');
+
+      if (list.length === 0) {
+        tbody.innerHTML = ''; empty.style.display = 'block';
+        document.getElementById('pendingTable').style.display = 'none';
+        return;
+      }
+      document.getElementById('pendingTable').style.display = 'table'; empty.style.display = 'none';
+
+      tbody.innerHTML = list.map(function(d) {
+        return '<tr>' +
+          '<td>' + d.name + '</td>' +
+          '<td>' + d.type + '</td>' +
+          '<td>' + d.copyrightType + '</td>' +
+          '<td>' + d.submitterName + '</td>' +
+          '<td>' + d.createdAt + '</td>' +
+          '<td><button class="btn btn-sm btn-primary" onclick="openAuditModal(\'' + d.id + '\')">&#128270; 审核</button></td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function renderReviewed() {
+      var resultFilter = document.getElementById('filterResult').value;
+      var typeFilter = document.getElementById('filterType').value;
+      var list = dramas.filter(function(d) {
+        if (d.status !== '已完成') return false;
+        if (resultFilter !== 'all' && d.auditResult !== resultFilter) return false;
+        if (typeFilter !== 'all' && d.type !== typeFilter) return false;
+        return true;
+      });
+      document.getElementById('reviewedCount').textContent = list.length;
+      var tbody = document.querySelector('#reviewedTable tbody');
+      var empty = document.getElementById('reviewedEmpty');
+
+      if (list.length === 0) {
+        tbody.innerHTML = ''; empty.style.display = 'block';
+        document.getElementById('reviewedTable').style.display = 'none';
+        return;
+      }
+      document.getElementById('reviewedTable').style.display = 'table'; empty.style.display = 'none';
+
+      tbody.innerHTML = list.map(function(d) {
+        var rc = window.utils.resultColor(d.auditResult);
+        var resultHtml = d.auditResult ? '<span class="tag-result" style="background:' + rc + '22;color:' + rc + ';border:1px solid ' + rc + '66">' + d.auditResult + '</span>' : '&#8212;';
+        return '<tr>' +
+          '<td>' + d.name + '</td>' +
+          '<td>' + d.type + '</td>' +
+          '<td>' + d.copyrightType + '</td>' +
+          '<td>' + d.submitterName + '</td>' +
+          '<td>' + resultHtml + '</td>' +
+          '<td>' + d.createdAt + '</td>' +
+          '<td style="width:120px"><button class="btn btn-sm" style="color:var(--neon-cyan);border-color:rgba(0,240,255,0.3)" onclick="openDetailModal(\'' + d.id + '\')">&#128196; 详情</button></td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function openAuditModal(dramaId) {
+      currentAuditId = dramaId;
+      var drama = dramas.find(function(d) { return d.id === dramaId; });
+      if (!drama) return;
+
+      var html = '<div style="display:flex;gap:16px;margin-bottom:16px">' +
+        '<div style="width:160px;height:100px;background:linear-gradient(135deg,#1a1a2e,#0a0f1e);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--neon-pink);text-shadow:0 0 20px rgba(232,62,140,0.4);border:1px solid var(--border-color)">&#9654;</div>' +
+        '<div>' +
+          '<h3 style="margin-bottom:8px">' + drama.name + '</h3>' +
+          '<div style="margin-bottom:4px"><span class="tag-result" style="background:rgba(0,240,255,0.08);color:var(--neon-cyan);border:1px solid rgba(0,240,255,0.2);margin-right:4px">' + drama.type + '</span>' +
+          '<span class="tag-result" style="background:rgba(0,240,255,0.08);color:var(--neon-cyan);border:1px solid rgba(0,240,255,0.2);margin-right:4px">' + drama.copyrightType + '</span>' +
+          '<span class="tag-result" style="background:rgba(148,163,184,0.1);color:var(--text-secondary);border:1px solid rgba(148,163,184,0.2)">' + drama.timeliness + '</span></div>' +
+          '<div style="color:var(--text-secondary);font-size:13px">提报人：' + drama.submitterName + ' &middot; 上传时间：' + drama.createdAt + '</div>' +
+        '</div></div>' +
+        '<form id="auditForm">' +
+          '<div class="form-group"><label class="form-label">审核评级 <span style="color:var(--neon-red)">*</span></label>' +
+          '<div class="radio-group">' + resultOptions.map(function(r) {
+            var color = window.utils.resultColor(r);
+            return '<label class="radio-item" style="padding:8px 14px;border:1px solid ' + color + '44;border-radius:8px;color:' + color + ';cursor:pointer;transition:all 0.3s">' +
+              '<input type="radio" name="result" value="' + r + '" required style="margin-right:6px">' + r + '</label>';
+          }).join('') + '</div></div>' +
+          '<div class="form-group"><label class="form-label">审核意见 <span style="color:var(--neon-red)">*</span></label>' +
+          '<textarea name="comment" class="form-input" rows="4" placeholder="请输入审核意见..." required></textarea></div>' +
+          '<div style="text-align:right;margin-top:16px">' +
+            '<button type="button" class="btn" onclick="closeAuditModal()" style="margin-right:8px">取消</button>' +
+            '<button type="submit" class="btn btn-primary">确认审核</button>' +
+          '</div>' +
+        '</form>';
+      document.getElementById('auditBody').innerHTML = html;
+      document.getElementById('auditModal').classList.add('active');
+
+      document.getElementById('auditForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var result = e.target.result.value;
+        var comment = e.target.comment.value;
+        var idx = dramas.findIndex(function(d) { return d.id === currentAuditId; });
+        if (idx !== -1) {
+          if (!dramas[idx].auditHistory) dramas[idx].auditHistory = [];
+          dramas[idx].auditHistory.push({
+            time: new Date().toISOString().replace('T', ' ').slice(0, 19),
+            result: result,
+            comment: comment
+          });
+          dramas[idx].status = '已完成';
+          dramas[idx].auditResult = result;
+          dramas[idx].updatedAt = new Date().toISOString().replace('T', ' ').slice(0, 19);
+          window.MOCK.dramas = dramas;
+        }
+        alert('审核完成');
+        closeAuditModal();
+        renderPending();
+        renderReviewed();
+      });
+    }
+
+    function closeAuditModal() {
+      document.getElementById('auditModal').classList.remove('active');
+      currentAuditId = null;
+    }
+
+    // 审核详情弹窗
+    var currentDetailId = null;
+
+    function openDetailModal(dramaId) {
+      currentDetailId = dramaId;
+      var drama = dramas.find(function(d) { return d.id === dramaId; });
+      if (!drama) return;
+
+      var history = drama.auditHistory || [];
+      var rc = window.utils.resultColor(drama.auditResult);
+
+      var historyHtml = '';
+      if (history.length > 0) {
+        historyHtml = '<div style="margin-bottom:24px">' +
+          '<h4 style="color:var(--neon-cyan);margin-bottom:12px;font-size:14px">&#128220; 审核历史</h4>' +
+          '<div style="position:relative;padding-left:20px">' +
+            '<div style="position:absolute;left:5px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--neon-cyan),var(--neon-pink))"></div>' +
+            history.map(function(h, idx) {
+              var hrc = window.utils.resultColor(h.result);
+              return '<div style="position:relative;margin-bottom:16px;padding:12px 16px;background:rgba(0,240,255,0.03);border:1px solid rgba(0,240,255,0.1);border-radius:8px">' +
+                '<div style="position:absolute;left:-17px;top:18px;width:10px;height:10px;border-radius:50%;background:' + hrc + ';border:2px solid var(--bg-primary);box-shadow:0 0 8px ' + hrc + '"></div>' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+                  '<span class="tag-result" style="background:' + hrc + '22;color:' + hrc + ';border:1px solid ' + hrc + '66">' + h.result + '</span>' +
+                  '<span style="color:var(--text-secondary);font-size:12px">' + h.time + '</span>' +
+                '</div>' +
+                '<div style="color:var(--text-secondary);font-size:13px;line-height:1.6">' + h.comment + '</div>' +
+              '</div>';
+            }).join('') +
+          '</div></div>';
+      }
+
+      var html = '<div style="display:flex;gap:16px;margin-bottom:20px">' +
+        '<div style="width:140px;height:90px;background:linear-gradient(135deg,#1a1a2e,#0a0f1e);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--neon-pink);text-shadow:0 0 20px rgba(232,62,140,0.4);border:1px solid var(--border-color)">&#9654;</div>' +
+        '<div>' +
+          '<h3 style="margin-bottom:8px">' + drama.name + '</h3>' +
+          '<div style="margin-bottom:4px">' +
+            '<span class="tag-result" style="background:rgba(0,240,255,0.08);color:var(--neon-cyan);border:1px solid rgba(0,240,255,0.2);margin-right:4px">' + drama.type + '</span>' +
+            '<span class="tag-result" style="background:' + rc + '22;color:' + rc + ';border:1px solid ' + rc + '66;margin-right:4px">当前评级：' + drama.auditResult + '</span>' +
+          '</div>' +
+          '<div style="color:var(--text-secondary);font-size:13px">提报人：' + drama.submitterName + ' &middot; 共 ' + history.length + ' 次审核记录</div>' +
+        '</div></div>' +
+        historyHtml +
+        '<div style="border-top:1px solid var(--border-color);padding-top:20px">' +
+          '<h4 style="color:var(--neon-yellow);margin-bottom:12px;font-size:14px">&#9998; 修改审核</h4>' +
+          '<form id="modifyForm">' +
+            '<div class="form-group"><label class="form-label">新审核评级 <span style="color:var(--neon-red)">*</span></label>' +
+            '<div class="radio-group">' + resultOptions.map(function(r) {
+              var color = window.utils.resultColor(r);
+              var checked = r === drama.auditResult ? 'checked' : '';
+              return '<label class="radio-item" style="padding:8px 14px;border:1px solid ' + color + '44;border-radius:8px;color:' + color + ';cursor:pointer;transition:all 0.3s">' +
+                '<input type="radio" name="result" value="' + r + '" ' + checked + ' required style="margin-right:6px">' + r + '</label>';
+            }).join('') + '</div></div>' +
+            '<div class="form-group"><label class="form-label">修改意见 <span style="color:var(--neon-red)">*</span></label>' +
+            '<textarea name="comment" class="form-input" rows="3" placeholder="请输入新的修改意见..." required></textarea></div>' +
+            '<div style="text-align:right">' +
+              '<button type="button" class="btn" onclick="closeDetailModal()" style="margin-right:8px">关闭</button>' +
+              '<button type="submit" class="btn btn-primary">提交修改</button>' +
+            '</div>' +
+          '</form>' +
+        '</div>';
+
+      document.getElementById('detailBody').innerHTML = html;
+      document.getElementById('detailModal').classList.add('active');
+
+      document.getElementById('modifyForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var result = e.target.result.value;
+        var comment = e.target.comment.value;
+        var idx = dramas.findIndex(function(d) { return d.id === currentDetailId; });
+        if (idx !== -1) {
+          if (!dramas[idx].auditHistory) dramas[idx].auditHistory = [];
+          dramas[idx].auditHistory.push({
+            time: new Date().toISOString().replace('T', ' ').slice(0, 19),
+            result: result,
+            comment: comment
+          });
+          dramas[idx].auditResult = result;
+          dramas[idx].updatedAt = new Date().toISOString().replace('T', ' ').slice(0, 19);
+          window.MOCK.dramas = dramas;
+        }
+        alert('修改成功');
+        closeDetailModal();
+        renderReviewed();
+      });
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.remove('active');
+      currentDetailId = null;
+    }
+
+    renderPending();
+    renderReviewed();
+  </script>
+</body>
+</html>

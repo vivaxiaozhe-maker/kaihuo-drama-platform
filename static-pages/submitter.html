@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>开火短剧开放平台 - 我的提报</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/data.js"></script>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <canvas id="headerCanvas" class="header-bg"></canvas>
+    <div class="header-left">
+      <span class="header-logo">&#128293;</span>
+      <span class="header-title">开火短剧开放平台</span>
+    </div>
+    <div class="header-right">
+      <span id="roleTag" class="role-tag">提报人</span>
+      <span id="userName" class="user-name">张三</span>
+      <button class="btn-logout" onclick="logout()">退出</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- 左侧边栏 -->
+    <aside class="sider">
+      <ul class="sider-menu">
+        <li><a href="submitter.html" class="active">&#127909; 我的提报</a></li>
+        <li><a href="submitter.html?tab=upload">&#128316; 上传新剧</a></li>
+        <li><a href="auditor.html">&#128270; 审核后台</a></li>
+      </ul>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <h1 class="page-title">我的提报</h1>
+      <p class="page-subtitle">管理您上传的剧集内容</p>
+
+      <!-- 统计卡片 -->
+      <div class="stat-cards" id="statCards"></div>
+
+      <!-- Tab -->
+      <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('list')">剧集列表</div>
+        <div class="tab-item" onclick="switchTab('upload')">&#43; 上传新剧</div>
+      </div>
+
+      <!-- 剧集列表 -->
+      <div id="panel-list" class="tab-panel active">
+        <div class="card">
+          <div class="search-bar">
+            <input type="text" id="searchName" class="input" placeholder="搜索剧名..." style="width: 280px;">
+            <select id="searchTimeliness" class="select" style="width: 140px;">
+              <option value="全部时效">全部时效</option>
+              <option value="T-7">T-7</option>
+              <option value="T-15">T-15</option>
+              <option value="T-30">T-30</option>
+            </select>
+            <button class="btn btn-primary" onclick="renderTable()">搜索</button>
+          </div>
+          <table class="table" id="dramaTable">
+            <thead>
+              <tr>
+                <th>剧名</th>
+                <th style="width:80px">类型</th>
+                <th style="width:80px">时效性</th>
+                <th style="width:160px">上传日期</th>
+                <th style="width:100px">状态</th>
+                <th style="width:100px">审核结果</th>
+                <th style="width:280px">操作</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="emptyState" class="empty" style="display:none">暂无剧集数据</div>
+        </div>
+      </div>
+
+      <!-- 上传新剧 -->
+      <div id="panel-upload" class="tab-panel">
+        <div class="card">
+          <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 24px; color: var(--neon-cyan);">上传新剧</h2>
+          <form id="uploadForm">
+            <div class="form-group">
+              <label class="form-label">剧名 <span style="color:var(--neon-red)">*</span></label>
+              <input type="text" name="name" class="form-input" placeholder="请输入剧名" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">视频地址 <span style="color:var(--neon-red)">*</span></label>
+              <input type="text" name="videoUrl" class="form-input" placeholder="请输入视频地址或者网盘地址" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">类型 <span style="color:var(--neon-red)">*</span></label>
+              <div class="radio-group">
+                <label class="radio-item"><input type="radio" name="type" value="真人" required> <span>真人</span></label>
+                <label class="radio-item"><input type="radio" name="type" value="AI剧"> <span>AI剧</span></label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">版权类型 <span style="color:var(--neon-red)">*</span></label>
+              <div class="radio-group">
+                <label class="radio-item"><input type="radio" name="copyrightType" value="定制剧" required> <span>定制剧</span></label>
+                <label class="radio-item"><input type="radio" name="copyrightType" value="成品剧"> <span>成品剧</span></label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">花絮卡点描述</label>
+              <textarea name="highlightDescription" class="form-input" rows="3" placeholder="例如：卡1：第11集，卡2：第25集"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">花絮、卡点</label>
+              <div class="upload-area" onclick="alert('演示模式：文件上传功能仅作展示')">
+                <div style="font-size: 40px; color: var(--neon-cyan); margin-bottom: 12px; text-shadow: 0 0 20px rgba(0,240,255,0.4);">&#43;</div>
+                <div>点击或拖拽视频/图片文件到此处</div>
+                <div style="color: var(--text-secondary); font-size: 12px; margin-top: 6px;">支持多文件同时上传</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+              <button type="submit" class="btn btn-gradient" style="width: 120px;">提交上传</button>
+              <button type="button" class="btn" onclick="switchTab('list')" style="width: 100px;">取消</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Header 粒子背景
+    (function() {
+      var canvas = document.getElementById('headerCanvas');
+      var ctx = canvas.getContext('2d');
+      var particles = [];
+      var count = 40;
+
+      function resize() {
+        canvas.width = canvas.parentElement.offsetWidth;
+        canvas.height = canvas.parentElement.offsetHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      for (var i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          radius: Math.random() * 1.5 + 0.5
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
+          ctx.fill();
+          for (var j = i + 1; j < particles.length; j++) {
+            var p2 = particles[j];
+            var dx = p.x - p2.x, dy = p.y - p2.y;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 100) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = 'rgba(0, 240, 255, ' + (0.2 * (1 - dist / 100)) + ')';
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+
+    var user = window.MOCK.getUser();
+    if (!user) { window.location.href = 'index.html'; }
+    else {
+      document.getElementById('roleTag').textContent = user.role === 'auditor' ? '审核人' : '提报人';
+      document.getElementById('roleTag').className = 'role-tag' + (user.role === 'auditor' ? ' auditor' : '');
+      document.getElementById('userName').textContent = user.displayName;
+    }
+    function logout() { window.MOCK.logout(); window.location.href = 'index.html'; }
+
+    var dramas = window.MOCK.dramas;
+    var statusFilter = null;
+
+    function renderStats() {
+      var stats = {
+        total: dramas.length,
+        pending: dramas.filter(function(d) { return d.status === '待审核'; }).length,
+        reviewing: dramas.filter(function(d) { return d.status === '审核中'; }).length,
+        completed: dramas.filter(function(d) { return d.status === '已完成'; }).length
+      };
+      var configs = [
+        { label: '我的剧集', value: stats.total, bg: 'rgba(0, 240, 255, 0.15)', color: '#00f0ff', icon: '&#127909;', status: null },
+        { label: '待审核', value: stats.pending, bg: 'rgba(250, 173, 20, 0.15)', color: '#faad14', icon: '&#8212;', status: '待审核' },
+        { label: '审核中', value: stats.reviewing, bg: 'rgba(255, 152, 0, 0.15)', color: '#ff9800', icon: '&#8230;', status: '审核中' },
+        { label: '已完成', value: stats.completed, bg: 'rgba(0, 255, 136, 0.15)', color: '#00ff88', icon: '&#10003;', status: '已完成' }
+      ];
+      document.getElementById('statCards').innerHTML = configs.map(function(c) {
+        return '<div class="card card-hover" onclick="filterStatus(\'' + (c.status || '') + '\')">' +
+          '<div class="stat-card">' +
+            '<div class="stat-icon" style="background:' + c.bg + ';color:' + c.color + '">' + c.icon + '</div>' +
+            '<div><div class="stat-value" style="color:' + c.color + '">' + c.value + '</div><div class="stat-label">' + c.label + '</div></div>' +
+          '</div></div>';
+      }).join('');
+    }
+
+    function renderTable() {
+      var name = document.getElementById('searchName').value.trim();
+      var timeliness = document.getElementById('searchTimeliness').value;
+      var filtered = dramas.filter(function(d) {
+        if (name && d.name.indexOf(name) === -1) return false;
+        if (timeliness !== '全部时效' && d.timeliness !== timeliness) return false;
+        if (statusFilter && d.status !== statusFilter) return false;
+        return true;
+      });
+
+      var tbody = document.querySelector('#dramaTable tbody');
+      var empty = document.getElementById('emptyState');
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        document.getElementById('dramaTable').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('dramaTable').style.display = 'table';
+      empty.style.display = 'none';
+
+      tbody.innerHTML = filtered.map(function(d) {
+        var statusColor = window.utils.statusColor(d.status);
+        var resultColor = d.auditResult ? window.utils.resultColor(d.auditResult) : '';
+        var resultHtml = d.auditResult
+          ? '<span class="tag-result" style="background:' + resultColor + '33;color:' + resultColor + ';border:1px solid ' + resultColor + '66">' + d.auditResult + '</span>'
+          : '&#8212;';
+
+        return '<tr>' +
+          '<td><a href="drama-detail.html?id=' + d.id + '" style="color:var(--neon-pink)">' + d.name + '</a></td>' +
+          '<td>' + d.type + '</td>' +
+          '<td>' + d.timeliness + '</td>' +
+          '<td>' + d.createdAt + '</td>' +
+          '<td><span class="tag" style="color:' + statusColor + '"><span class="tag-dot" style="background:' + statusColor + ';box-shadow:0 0 6px ' + statusColor + '"></span>' + d.status + '</span></td>' +
+          '<td>' + resultHtml + '</td>' +
+          '<td>' +
+            '<a href="drama-detail.html?id=' + d.id + '" class="btn btn-sm btn-outline-pink">详情</a> ' +
+            '<a href="drama-detail.html?id=' + d.id + '" class="btn btn-sm btn-outline-pink">素材</a> ' +
+            '<a href="episodes.html?id=' + d.id + '" class="btn btn-sm btn-outline-pink">成片</a>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function filterStatus(status) {
+      statusFilter = status || null;
+      switchTab('list');
+      renderTable();
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-item').forEach(function(el) { el.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function(el) { el.classList.remove('active'); });
+      var idx = tab === 'list' ? 0 : 1;
+      document.querySelectorAll('.tab-item')[idx].classList.add('active');
+      document.getElementById('panel-' + tab).classList.add('active');
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var form = e.target;
+      var newDrama = {
+        id: 'd' + Date.now(),
+        name: form.name.value,
+        videoUrl: form.videoUrl.value,
+        type: form.type.value,
+        copyrightType: form.copyrightType.value,
+        highlightDescription: form.highlightDescription.value,
+        timeliness: 'T-7',
+        status: '待审核',
+        auditResult: null,
+        submitterId: 'u1',
+        submitterName: '张三',
+        createdAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        updatedAt: new Date().toISOString().replace('T', ' ').slice(0, 19)
+      };
+      dramas.unshift(newDrama);
+      window.MOCK.dramas = dramas;
+      alert('上传成功');
+      form.reset();
+      renderStats();
+      switchTab('list');
+      renderTable();
+    });
+
+    renderStats();
+    renderTable();
+
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'upload') {
+      switchTab('upload');
+    }
+  </script>
+</body>
+</html>

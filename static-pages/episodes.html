@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>开火短剧开放平台 - 成片上传</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/data.js"></script>
+</head>
+<body>
+  <header class="header">
+    <canvas id="headerCanvas" class="header-bg"></canvas>
+    <div class="header-left">
+      <span class="header-logo">&#128293;</span>
+      <span class="header-title">开火短剧开放平台</span>
+    </div>
+    <div class="header-right">
+      <span id="roleTag" class="role-tag">提报人</span>
+      <span id="userName" class="user-name">张三</span>
+      <button class="btn-logout" onclick="logout()">退出</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sider">
+      <ul class="sider-menu">
+        <li><a href="submitter.html">&#127909; 我的提报</a></li>
+        <li><a href="submitter.html?tab=upload">&#128316; 上传新剧</a></li>
+        <li><a href="auditor.html">&#128270; 审核后台</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <h1 class="page-title">成片上传</h1>
+      <p class="page-subtitle" id="dramaName">-</p>
+
+      <div class="card">
+        <p style="color:var(--text-secondary); font-size:13px; margin-bottom:16px">
+          文件请以「顺序号_分集标题」命名（如 1_第一集.mp4），系统自动识别集数
+        </p>
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px">
+          <label style="font-weight:500; color:var(--text-primary)">视频文件（可多选）</label>
+          <input type="file" id="fileInput" multiple accept=".mp4,.mov" style="display:none" onchange="handleFiles(this)">
+          <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">&#128229; 选择文件</button>
+          <span id="fileNames" style="color:var(--text-secondary); font-size:13px"></span>
+        </div>
+        <div id="uploadProgress"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:16px; color:var(--neon-cyan)">已上传剧集</h3>
+        <div id="episodesSection"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function() {
+      var canvas = document.getElementById('headerCanvas');
+      var ctx = canvas.getContext('2d');
+      var particles = [];
+      function resize() { canvas.width = canvas.parentElement.offsetWidth; canvas.height = canvas.parentElement.offsetHeight; }
+      resize(); window.addEventListener('resize', resize);
+      for (var i = 0; i < 40; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5, radius: Math.random() * 1.5 + 0.5 });
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i]; p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 240, 255, 0.4)'; ctx.fill();
+          for (var j = i + 1; j < particles.length; j++) {
+            var p2 = particles[j]; var dx = p.x - p2.x, dy = p.y - p2.y; var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 100) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.strokeStyle = 'rgba(0, 240, 255, ' + (0.2 * (1 - dist / 100)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+
+    var user = window.MOCK.getUser();
+    if (!user) { window.location.href = 'index.html'; }
+    else {
+      document.getElementById('roleTag').textContent = user.role === 'auditor' ? '审核人' : '提报人';
+      document.getElementById('roleTag').className = 'role-tag' + (user.role === 'auditor' ? ' auditor' : '');
+      document.getElementById('userName').textContent = user.displayName;
+    }
+    function logout() { window.MOCK.logout(); window.location.href = 'index.html'; }
+
+    var id = window.utils.getParam('id');
+    var drama = window.MOCK.dramas.find(function(d) { return d.id === id; });
+    if (drama) document.getElementById('dramaName').textContent = drama.name;
+
+    var episodes = window.MOCK.episodes[id] ? window.MOCK.episodes[id].slice() : [];
+
+    function renderEpisodes() {
+      var section = document.getElementById('episodesSection');
+      if (episodes.length === 0) {
+        section.innerHTML = '<div class="empty">暂无已上传的剧集</div>';
+        return;
+      }
+      section.innerHTML = '<table class="table"><thead><tr>' +
+        '<th>集数</th><th>标题</th><th>文件名</th><th>大小</th><th>上传时间</th><th>操作</th>' +
+        '</tr></thead><tbody>' +
+        episodes.map(function(e) {
+          return '<tr>' +
+            '<td>第' + e.episodeNumber + '集</td>' +
+            '<td>' + e.title + '</td>' +
+            '<td>' + e.fileName + '</td>' +
+            '<td>' + window.utils.formatSize(e.fileSize) + '</td>' +
+            '<td>' + e.createdAt + '</td>' +
+            '<td><button class="btn btn-sm">替换</button> <button class="btn btn-sm" style="color:var(--neon-red);border-color:rgba(255,56,96,0.3);background:rgba(255,56,96,0.05)" onclick="deleteEpisode(\'' + e.id + '\')">删除</button></td>' +
+          '</tr>';
+        }).join('') +
+        '</tbody></table>';
+    }
+
+    function handleFiles(input) {
+      var files = input.files;
+      if (!files.length) return;
+      var names = [];
+      var progressDiv = document.getElementById('uploadProgress');
+      progressDiv.innerHTML = '';
+
+      Array.from(files).forEach(function(file, idx) {
+        names.push(file.name);
+        var tempId = 'upload_' + idx;
+        var match = file.name.match(/^(\d+)_(.+)\.(mp4|mov)$/i);
+        var episodeNumber = match ? parseInt(match[1]) : episodes.length + idx + 1;
+        var title = match ? match[2] : file.name.replace(/\.[^/.]+$/, '');
+
+        progressDiv.innerHTML += '<div style="margin-bottom:12px" id="' + tempId + '">' +
+          '<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px">' +
+            '<span style="color:var(--text-primary)">' + file.name + '</span><span class="progress-text" style="color:var(--neon-cyan)">0%</span></div>' +
+          '<div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div></div>';
+
+        var progress = 0;
+        var interval = setInterval(function() {
+          progress += Math.random() * 25;
+          if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            document.querySelector('#' + tempId + ' .progress-text').innerHTML = '&#10003; <span style="color:var(--neon-green)">上传成功</span>';
+            var newEp = {
+              id: 'e' + Date.now() + Math.random().toString(36).slice(2),
+              dramaId: id,
+              episodeNumber: episodeNumber,
+              title: title,
+              fileName: file.name,
+              fileSize: file.size,
+              createdAt: new Date().toISOString().replace('T', ' ').slice(0, 19)
+            };
+            episodes.push(newEp);
+            episodes.sort(function(a, b) { return a.episodeNumber - b.episodeNumber; });
+            setTimeout(renderEpisodes, 300);
+          }
+          document.querySelector('#' + tempId + ' .progress-fill').style.width = progress + '%';
+          document.querySelector('#' + tempId + ' .progress-text').textContent = Math.round(progress) + '%';
+        }, 200);
+      });
+
+      document.getElementById('fileNames').textContent = names.join(', ');
+    }
+
+    function deleteEpisode(epId) {
+      if (confirm('确定要删除该集吗？')) {
+        episodes = episodes.filter(function(e) { return e.id !== epId; });
+        renderEpisodes();
+      }
+    }
+
+    renderEpisodes();
+  </script>
+</body>
+</html>
