@@ -25,10 +25,10 @@
   <div class="layout">
     <!-- 左侧边栏 -->
     <aside class="sider">
-      <ul class="sider-menu">
-        <li><a href="submitter.html" class="active">&#127909; 我的提报</a></li>
-        <li><a href="submitter.html?tab=upload">&#128316; 上传新剧</a></li>
-        <li><a href="auditor.html">&#128270; 审核后台</a></li>
+      <ul class="sider-menu" id="siderMenu">
+        <li><a href="submitter.html" id="menuSubmitter">&#127909; 我的提报</a></li>
+        <li><a href="submitter.html?tab=upload" id="menuUpload">&#128316; 上传新剧</a></li>
+        <li><a href="auditor.html" id="menuAuditor">&#128270; 审核后台</a></li>
       </ul>
     </aside>
 
@@ -189,6 +189,16 @@
       document.getElementById('userName').textContent = user.displayName;
     }
     function logout() { window.MOCK.logout(); window.location.href = 'index.html'; }
+
+    // 侧边栏 active 状态
+    var urlParams2 = new URLSearchParams(window.location.search);
+    var tabParam2 = urlParams2.get('tab');
+    document.querySelectorAll('#siderMenu a').forEach(function(el) { el.classList.remove('active'); });
+    if (tabParam2 === 'upload') {
+      document.getElementById('menuUpload').classList.add('active');
+    } else {
+      document.getElementById('menuSubmitter').classList.add('active');
+    }
 
     var dramas = window.MOCK.dramas;
     var statusFilter = null;

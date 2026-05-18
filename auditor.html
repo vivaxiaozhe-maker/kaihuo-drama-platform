@@ -44,7 +44,7 @@
         <div id="panel-pending" class="tab-panel active">
           <table class="table" id="pendingTable">
             <thead>
-              <tr><th>剧名</th><th style="width:80px">类型</th><th style="width:90px">版权类型</th><th style="width:100px">提报人</th><th style="width:160px">上传日期</th><th style="width:100px">操作</th></tr>
+              <tr><th>剧名</th><th style="width:80px">类型</th><th style="width:90px">版权类型</th><th style="width:120px">公司</th><th style="width:100px">提报人</th><th style="width:160px">上传日期</th><th style="width:100px">操作</th></tr>
             </thead>
             <tbody></tbody>
           </table>
@@ -70,7 +70,7 @@
           </div>
           <table class="table" id="reviewedTable">
             <thead>
-              <tr><th>剧名</th><th style="width:80px">类型</th><th style="width:90px">版权类型</th><th style="width:100px">提报人</th><th style="width:100px">审核结果</th><th style="width:160px">上传日期</th><th style="width:120px">操作</th></tr>
+              <tr><th>剧名</th><th style="width:80px">类型</th><th style="width:90px">版权类型</th><th style="width:120px">公司</th><th style="width:100px">提报人</th><th style="width:100px">审核结果</th><th style="width:160px">上传日期</th><th style="width:120px">操作</th></tr>
             </thead>
             <tbody></tbody>
           </table>
@@ -166,6 +166,7 @@
           '<td>' + d.name + '</td>' +
           '<td>' + d.type + '</td>' +
           '<td>' + d.copyrightType + '</td>' +
+          '<td>' + (d.company || '—') + '</td>' +
           '<td>' + d.submitterName + '</td>' +
           '<td>' + d.createdAt + '</td>' +
           '<td><button class="btn btn-sm btn-primary" onclick="openAuditModal(\'' + d.id + '\')">&#128270; 审核</button></td>' +
@@ -200,6 +201,7 @@
           '<td>' + d.name + '</td>' +
           '<td>' + d.type + '</td>' +
           '<td>' + d.copyrightType + '</td>' +
+          '<td>' + (d.company || '—') + '</td>' +
           '<td>' + d.submitterName + '</td>' +
           '<td>' + resultHtml + '</td>' +
           '<td>' + d.createdAt + '</td>' +
@@ -220,7 +222,7 @@
           '<div style="margin-bottom:4px"><span class="tag-result" style="background:rgba(0,240,255,0.08);color:var(--neon-cyan);border:1px solid rgba(0,240,255,0.2);margin-right:4px">' + drama.type + '</span>' +
           '<span class="tag-result" style="background:rgba(0,240,255,0.08);color:var(--neon-cyan);border:1px solid rgba(0,240,255,0.2);margin-right:4px">' + drama.copyrightType + '</span>' +
           '<span class="tag-result" style="background:rgba(148,163,184,0.1);color:var(--text-secondary);border:1px solid rgba(148,163,184,0.2)">' + drama.timeliness + '</span></div>' +
-          '<div style="color:var(--text-secondary);font-size:13px">提报人：' + drama.submitterName + ' &middot; 上传时间：' + drama.createdAt + '</div>' +
+          '<div style="color:var(--text-secondary);font-size:13px">公司：' + (drama.company || '—') + ' &middot; 提报人：' + drama.submitterName + ' &middot; 上传时间：' + drama.createdAt + '</div>' +
         '</div></div>' +
         '<form id="auditForm">' +
           '<div class="form-group"><label class="form-label">审核评级 <span style="color:var(--neon-red)">*</span></label>' +
@@ -307,7 +309,7 @@
             '<span class="tag-result" style="background:rgba(0,240,255,0.08);color:var(--neon-cyan);border:1px solid rgba(0,240,255,0.2);margin-right:4px">' + drama.type + '</span>' +
             '<span class="tag-result" style="background:' + rc + '22;color:' + rc + ';border:1px solid ' + rc + '66;margin-right:4px">当前评级：' + drama.auditResult + '</span>' +
           '</div>' +
-          '<div style="color:var(--text-secondary);font-size:13px">提报人：' + drama.submitterName + ' &middot; 共 ' + history.length + ' 次审核记录</div>' +
+          '<div style="color:var(--text-secondary);font-size:13px">公司：' + (drama.company || '—') + ' &middot; 提报人：' + drama.submitterName + ' &middot; 共 ' + history.length + ' 次审核记录</div>' +
         '</div></div>' +
         historyHtml +
         '<div style="border-top:1px solid var(--border-color);padding-top:20px">' +
