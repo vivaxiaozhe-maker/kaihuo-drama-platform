@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>开火短剧开放平台 - 合作伙伴入驻</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .onboarding-page {
+      min-height: 100vh;
+      padding: 40px 20px;
+      position: relative;
+      z-index: 2;
+    }
+    .onboarding-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .onboarding-header h1 {
+      font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+      font-size: 22px;
+      margin-bottom: 4px;
+      background: linear-gradient(90deg, var(--text-primary), var(--neon-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .onboarding-header p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    /* 步骤条 */
+    .steps-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+      gap: 0;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+    .step-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      border: 2px solid var(--text-secondary);
+      color: var(--text-secondary);
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+    .step-item.active .step-circle {
+      border-color: var(--neon-pink);
+      color: var(--neon-pink);
+      box-shadow: 0 0 12px rgba(232, 62, 140, 0.3);
+    }
+    .step-item.done .step-circle {
+      border-color: var(--neon-pink);
+      background: var(--neon-pink);
+      color: #fff;
+    }
+    .step-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .step-item.active .step-label {
+      color: var(--neon-pink);
+    }
+    .step-item.done .step-label {
+      color: var(--neon-pink);
+    }
+    .step-line {
+      width: 60px;
+      height: 2px;
+      background: var(--border-color);
+      margin: 0 12px;
+    }
+    .step-line.done {
+      background: var(--neon-pink);
+    }
+    /* 表单卡片 */
+    .form-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .form-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.3), transparent);
+    }
+    .form-card h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--neon-cyan);
+    }
+    .form-card .subtitle {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 28px 0 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 18px;
+      background: var(--neon-pink);
+      border-radius: 2px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+    .upload-preview {
+      width: 100%;
+      max-width: 200px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .upload-preview img {
+      width: 100%;
+      display: block;
+    }
+    .upload-preview .file-info {
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+      background: rgba(0,0,0,0.2);
+    }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    .checkbox-item:hover, .checkbox-item.checked {
+      border-color: var(--neon-cyan);
+      background: rgba(0, 240, 255, 0.05);
+    }
+    .checkbox-item input {
+      display: none;
+    }
+    .checkbox-item.checked::before {
+      content: '&#10003;';
+      color: var(--neon-cyan);
+      margin-right: 4px;
+    }
+    /* 动态表格 */
+    .works-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .works-table th, .works-table td {
+      padding: 10px 8px;
+      border: 1px solid var(--border-color);
+      text-align: left;
+    }
+    .works-table th {
+      background: rgba(0, 240, 255, 0.05);
+      color: var(--neon-cyan);
+      font-weight: 500;
+      font-size: 12px;
+    }
+    .works-table td input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+    }
+    .works-table td input::placeholder {
+      color: var(--text-secondary);
+    }
+    /* 协议区 */
+    .agreement-box {
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      max-height: 240px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .agreement-box h4 {
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .summary-card {
+      background: rgba(0, 240, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .summary-card h4 {
+      font-size: 14px;
+      color: var(--neon-cyan);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .summary-card h4 a {
+      font-size: 12px;
+      color: var(--neon-pink);
+      cursor: pointer;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+    .summary-label {
+      color: var(--text-secondary);
+    }
+    .summary-value {
+      color: var(--text-primary);
+      text-align: right;
+    }
+    /* 底部操作 */
+    .form-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+    .step-panel {
+      display: none;
+    }
+    .step-panel.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+    @media (max-width: 640px) {
+      .form-row { grid-template-columns: 1fr; }
+      .form-card { padding: 24px; }
+      .step-line { width: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="onboarding-page">
+    <div class="onboarding-header">
+      <h1>&#128293; 开火短剧开放平台</h1>
+      <p>合作伙伴入驻申请</p>
+    </div>
+
+    <!-- 步骤条 -->
+    <div class="steps-bar" id="stepsBar">
+      <div class="step-item active" data-step="1">
+        <div class="step-circle">1</div>
+        <span class="step-label">企业信息</span>
+      </div>
+      <div class="step-line" id="line1"></div>
+      <div class="step-item" data-step="2">
+        <div class="step-circle">2</div>
+        <span class="step-label">联系人</span>
+      </div>
+      <div class="step-line" id="line2"></div>
+      <div class="step-item" data-step="3">
+        <div class="step-circle">3</div>
+        <span class="step-label">业务能力</span>
+      </div>
+      <div class="step-line" id="line3"></div>
+      <div class="step-item" data-step="4">
+        <div class="step-circle">4</div>
+        <span class="step-label">协议提交</span>
+      </div>
+    </div>
+
+    <!-- 表单卡片 -->
+    <div class="form-card">
+      <!-- 步骤1：企业信息 -->
+      <div class="step-panel active" id="step-1">
+        <h2>企业信息</h2>
+        <p class="subtitle">请填写您的企业/机构基本信息</p>
+
+        <div class="form-row">
+          <div class="form-group full">
+            <label class="form-label">企业名称 <span style="color:var(--neon-red)">*</span></label>
+            <input type="text" id="cName" class="form-input" placeholder="请输入营业执照上的企业全称" maxlength="50" required>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">统一社会信用代码 <span style="color:var(--neon-red)">*</span></label>
+            <input type="text" id="cCode" class="form-input" placeholder="请输入18位统一社会信用代码" required>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">营业执照 <span style="color:var(--neon-red)">*</span></label>
+            <div class="upload-area" id="licenseUpload" style="height: 160px;" onclick="document.getElementById('licenseInput').click()">
+              <div id="licensePlaceholder">
+                <div style="font-size: 32px; color: var(--neon-cyan); margin-bottom: 8px;">&#128194;</div>
+                <div>点击上传营业执照</div>
+                <div style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">支持 jpg、png、pdf，最大 10MB</div>
+              </div>
+              <div id="licensePreview" class="upload-preview" style="display:none;"></div>
+            </div>
+            <input type="file" id="licenseInput" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="handleLicenseUpload(this)">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">企业类型 <span style="color:var(--neon-red)">*</span></label>
+            <div class="radio-group" id="companyTypeGroup">
+              <label class="radio-item"><input type="radio" name="companyType" value="文化传媒公司"> <span>文化传媒公司</span></label>
+              <label class="radio-item"><input type="radio" name="companyType" value="影视制作公司"> <span>影视制作公司</span></label>
+              <label class="radio-item"><input type="radio" name="companyType" value="MCN机构"> <span>MCN机构</span></label>
+              <label class="radio-item"><input type="radio" name="companyType" value="个人工作室"> <span>个人工作室</span></label>
+              <label class="radio-item"><input type="radio" name="companyType" value="其他"> <span>其他</span></label>
+            </div>
+            <input type="text" id="companyTypeOther" class="form-input" placeholder="请填写其他企业类型" style="display:none; margin-top:8px; max-width: 300px;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">成立时间</label>
+            <input type="date" id="cDate" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">注册地址</label>
+            <input type="text" id="cRegAddr" class="form-input" placeholder="省/市/区 + 详细地址">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">办公地址</label>
+            <input type="text" id="cOfficeAddr" class="form-input" placeholder="如与注册地址不同可填写">
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤2：联系人 -->
+      <div class="step-panel" id="step-2">
+        <h2>联系人设置</h2>
+        <p class="subtitle">请填写企业对接人和法定代表人信息</p>
+
+        <div class="section-title">对接人信息</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">对接人姓名 <span style="color:var(--neon-red)">*</span></label>
+            <input type="text" id="cpName" class="form-input" placeholder="平台日常沟通联系人" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">对接人手机号 <span style="color:var(--neon-red)">*</span></label>
+            <input type="tel" id="cpPhone" class="form-input" placeholder="请输入手机号" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">对接人邮箱 <span style="color:var(--neon-red)">*</span></label>
+            <input type="email" id="cpEmail" class="form-input" placeholder="请输入邮箱" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">对接人职务</label>
+            <input type="text" id="cpPosition" class="form-input" placeholder="如：商务总监">
+          </div>
+        </div>
+
+        <div class="section-title">法定代表人信息</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">法人姓名 <span style="color:var(--neon-red)">*</span></label>
+            <input type="text" id="lpName" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">法人手机号 <span style="color:var(--neon-red)">*</span></label>
+            <input type="tel" id="lpPhone" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">法人身份证号 <span style="color:var(--neon-red)">*</span></label>
+            <input type="text" id="lpIdCard" class="form-input" placeholder="18位身份证号" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">法人邮箱</label>
+            <input type="email" id="lpEmail" class="form-input">
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤3：业务能力 -->
+      <div class="step-panel" id="step-3">
+        <h2>业务能力</h2>
+        <p class="subtitle">请填写您的内容生产能力和业务资质</p>
+
+        <div class="form-group full">
+          <label class="form-label">合作业务类型 <span style="color:var(--neon-red)">*</span></label>
+          <div class="checkbox-group" id="bizTypeGroup">
+            <label class="checkbox-item"><input type="checkbox" name="bizType" value="成品短剧"> 成品短剧</label>
+            <label class="checkbox-item"><input type="checkbox" name="bizType" value="定制短剧"> 定制短剧</label>
+            <label class="checkbox-item"><input type="checkbox" name="bizType" value="AI短剧"> AI短剧</label>
+            <label class="checkbox-item"><input type="checkbox" name="bizType" value="动漫短剧"> 动漫短剧</label>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">内容类型偏好</label>
+          <div class="checkbox-group" id="contentPrefGroup">
+            <label class="checkbox-item"><input type="checkbox" name="contentPref" value="真人实拍"> 真人实拍</label>
+            <label class="checkbox-item"><input type="checkbox" name="contentPref" value="AI生成"> AI生成</label>
+            <label class="checkbox-item"><input type="checkbox" name="contentPref" value="动画"> 动画</label>
+            <label class="checkbox-item"><input type="checkbox" name="contentPref" value="混合"> 混合</label>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">男女频偏好</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="genderPref" value="男频"> <span>男频</span></label>
+            <label class="radio-item"><input type="radio" name="genderPref" value="女频"> <span>女频</span></label>
+            <label class="radio-item"><input type="radio" name="genderPref" value="不限"> <span>不限</span></label>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">擅长题材</label>
+          <div class="checkbox-group" id="genreGroup">
+            <label class="checkbox-item"><input type="checkbox" name="genre" value="逆袭"> 逆袭</label>
+            <label class="checkbox-item"><input type="checkbox" name="genre" value="喜剧"> 喜剧</label>
+            <label class="checkbox-item"><input type="checkbox" name="genre" value="异能"> 异能</label>
+            <label class="checkbox-item"><input type="checkbox" name="genre" value="修仙"> 修仙</label>
+            <label class="checkbox-item"><input type="checkbox" name="genre" value="都市"> 都市</label>
+            <label class="checkbox-item"><input type="checkbox" name="genre" value="古装"> 古装</label>
+            <label class="checkbox-item"><input type="checkbox" name="genre" value="甜宠"> 甜宠</label>
+            <label class="checkbox-item"><input type="checkbox" name="genre" value="悬疑"> 悬疑</label>
+            <label class="checkbox-item"><input type="checkbox" name="genre" value="其他"> 其他</label>
+          </div>
+        </div>
+
+        <div class="section-title">资质证书</div>
+        <div class="form-row">
+          <div class="form-group full">
+            <label class="form-label">广播电视节目制作经营许可证 <span style="color:var(--neon-red)">*</span></label>
+            <div class="radio-group">
+              <label class="radio-item"><input type="radio" name="hasBroadcast" value="有" onchange="toggleLicenseFields(true)"> <span>有</span></label>
+              <label class="radio-item"><input type="radio" name="hasBroadcast" value="无" onchange="toggleLicenseFields(false)"> <span>无</span></label>
+            </div>
+          </div>
+          <div id="licenseFields" style="display:none;">
+            <div class="form-group">
+              <label class="form-label">许可证编号 <span style="color:var(--neon-red)">*</span></label>
+              <input type="text" id="licenseNo" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">有效期 <span style="color:var(--neon-red)">*</span></label>
+              <input type="date" id="licenseExpire" class="form-input">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">许可证扫描件 <span style="color:var(--neon-red)">*</span></label>
+              <div class="upload-area" style="padding: 24px;" onclick="alert('演示模式：文件上传功能仅作展示')">
+                <div style="font-size: 28px; color: var(--neon-cyan);">&#128194;</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">点击上传扫描件，最大 10MB</div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">网络文化经营许可证</label>
+            <div class="radio-group">
+              <label class="radio-item"><input type="radio" name="hasNetCulture" value="有"> <span>有</span></label>
+              <label class="radio-item"><input type="radio" name="hasNetCulture" value="无"> <span>无</span></label>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">其他资质</label>
+            <textarea id="otherQual" class="form-input" rows="2" placeholder="如有其他相关资质请说明"></textarea>
+          </div>
+        </div>
+
+        <div class="section-title">过往作品</div>
+        <div class="form-group full">
+          <label class="form-label">是否有已上线作品</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="hasWorks" value="是" onchange="toggleWorksTable(true)"> <span>是</span></label>
+            <label class="radio-item"><input type="radio" name="hasWorks" value="否" onchange="toggleWorksTable(false)"> <span>否</span></label>
+          </div>
+        </div>
+        <div id="worksSection" style="display:none;">
+          <table class="works-table" id="worksTable">
+            <thead>
+              <tr>
+                <th>作品名称</th>
+                <th style="width:100px">上线平台</th>
+                <th style="width:60px">集数</th>
+                <th style="width:80px">类型</th>
+                <th style="width:120px">播放链接</th>
+                <th style="width:50px">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" placeholder="短剧名称"></td>
+                <td><input type="text" placeholder="平台"></td>
+                <td><input type="number" placeholder="集数"></td>
+                <td>
+                  <select style="background:transparent;border:none;color:var(--text-primary);width:100%">
+                    <option>真人</option><option>AI剧</option><option>动漫</option>
+                  </select>
+                </td>
+                <td><input type="text" placeholder="可选"></td>
+                <td><button type="button" class="btn btn-sm" style="color:var(--neon-red)" onclick="deleteWorkRow(this)">删除</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <button type="button" class="btn" onclick="addWorkRow()">&#43; 添加作品</button>
+        </div>
+      </div>
+
+      <!-- 步骤4：协议与提交 -->
+      <div class="step-panel" id="step-4">
+        <h2>协议与提交</h2>
+        <p class="subtitle">确认信息并签署合作协议</p>
+
+        <div class="summary-card">
+          <h4>企业信息 <a onclick="goToStep(1)">修改</a></h4>
+          <div id="summaryCompany"></div>
+        </div>
+        <div class="summary-card">
+          <h4>联系人 <a onclick="goToStep(2)">修改</a></h4>
+          <div id="summaryContact"></div>
+        </div>
+        <div class="summary-card">
+          <h4>业务能力 <a onclick="goToStep(3)">修改</a></h4>
+          <div id="summaryBusiness"></div>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">合作协议</label>
+          <div class="agreement-box">
+            <h4>开火短剧开放平台合作协议</h4>
+            <p>1. 合作方保证所提交内容拥有合法版权或已获得版权方授权。</p>
+            <p>2. 合作方保证提交内容不违反国家法律法规，不含有色情、暴力、政治敏感等内容。</p>
+            <p>3. 平台有权对提交内容进行审核，审核结果以平台评定为准。</p>
+            <p>4. 合作方需按照平台要求提供完整的内容素材和物料。</p>
+            <p>5. 收益结算以双方另行签署的结算协议为准。</p>
+            <p>6. 合作方不得将平台提供的内部信息泄露给第三方。</p>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;">
+            <input type="checkbox" id="agreeCheck" onchange="toggleSubmitBtn()">
+            <span>我已阅读并同意《开火短剧开放平台合作协议》</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 底部操作 -->
+      <div class="form-footer">
+        <button type="button" class="btn" id="btnPrev" onclick="prevStep()" style="display:none;">上一步</button>
+        <button type="button" class="btn btn-gradient" id="btnNext" onclick="nextStep()">下一步</button>
+        <button type="button" class="btn btn-gradient" id="btnSubmit" onclick="submitForm()" style="display:none;" disabled>提交审核</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var currentStep = 1;
+    var totalSteps = 4;
+    var formData = {};
+
+    // 企业类型其他
+    document.querySelectorAll('input[name="companyType"]').forEach(function(r) {
+      r.addEventListener('change', function() {
+        document.getElementById('companyTypeOther').style.display = this.value === '其他' ? 'block' : 'none';
+      });
+    });
+
+    // 复选框样式切换
+    document.querySelectorAll('.checkbox-item input').forEach(function(cb) {
+      cb.addEventListener('change', function() {
+        this.closest('.checkbox-item').classList.toggle('checked', this.checked);
+      });
+    });
+
+    function toggleLicenseFields(show) {
+      document.getElementById('licenseFields').style.display = show ? 'block' : 'none';
+    }
+
+    function toggleWorksTable(show) {
+      document.getElementById('worksSection').style.display = show ? 'block' : 'none';
+    }
+
+    function handleLicenseUpload(input) {
+      if (!input.files.length) return;
+      var file = input.files[0];
+      document.getElementById('licensePlaceholder').style.display = 'none';
+      var preview = document.getElementById('licensePreview');
+      preview.style.display = 'block';
+      preview.innerHTML = '<div style="padding:20px;text-align:center;font-size:40px;color:var(--neon-cyan)">&#128196;</div>' +
+        '<div class="file-info"><span>' + file.name + '</span><span style="cursor:pointer;color:var(--neon-red)" onclick="clearLicense(event)">删除</span></div>';
+    }
+
+    function clearLicense(e) {
+      e.stopPropagation();
+      document.getElementById('licenseInput').value = '';
+      document.getElementById('licensePlaceholder').style.display = 'block';
+      document.getElementById('licensePreview').style.display = 'none';
+    }
+
+    function addWorkRow() {
+      var tbody = document.querySelector('#worksTable tbody');
+      if (tbody.children.length >= 10) { alert('最多添加10条'); return; }
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td><input type="text" placeholder="短剧名称"></td>' +
+        '<td><input type="text" placeholder="平台"></td>' +
+        '<td><input type="number" placeholder="集数"></td>' +
+        '<td><select style="background:transparent;border:none;color:var(--text-primary);width:100%"><option>真人</option><option>AI剧</option><option>动漫</option></select></td>' +
+        '<td><input type="text" placeholder="可选"></td>' +
+        '<td><button type="button" class="btn btn-sm" style="color:var(--neon-red)" onclick="deleteWorkRow(this)">删除</button></td>';
+      tbody.appendChild(tr);
+    }
+
+    function deleteWorkRow(btn) {
+      btn.closest('tr').remove();
+    }
+
+    function updateSteps() {
+      document.querySelectorAll('.step-item').forEach(function(el, idx) {
+        var step = idx + 1;
+        el.classList.remove('active', 'done');
+        if (step < currentStep) {
+          el.classList.add('done');
+          el.querySelector('.step-circle').innerHTML = '&#10003;';
+        } else if (step === currentStep) {
+          el.classList.add('active');
+          el.querySelector('.step-circle').innerHTML = step;
+        } else {
+          el.querySelector('.step-circle').innerHTML = step;
+        }
+      });
+      document.querySelectorAll('.step-line').forEach(function(line, idx) {
+        line.classList.toggle('done', idx + 1 < currentStep);
+      });
+
+      document.querySelectorAll('.step-panel').forEach(function(p) { p.classList.remove('active'); });
+      document.getElementById('step-' + currentStep).classList.add('active');
+
+      document.getElementById('btnPrev').style.display = currentStep > 1 ? 'inline-flex' : 'none';
+      document.getElementById('btnNext').style.display = currentStep < totalSteps ? 'inline-flex' : 'none';
+      document.getElementById('btnSubmit').style.display = currentStep === totalSteps ? 'inline-flex' : 'none';
+
+      if (currentStep === totalSteps) renderSummary();
+    }
+
+    function validateStep(step) {
+      var panel = document.getElementById('step-' + step);
+      var required = panel.querySelectorAll('[required]');
+      for (var i = 0; i < required.length; i++) {
+        if (!required[i].offsetParent) continue; // 隐藏元素跳过
+        if (!required[i].value.trim()) {
+          alert('请填写所有必填项');
+          required[i].focus();
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function collectStepData() {
+      if (currentStep === 1) {
+        formData.companyName = document.getElementById('cName').value;
+        formData.unifiedSocialCode = document.getElementById('cCode').value;
+        var ct = document.querySelector('input[name="companyType"]:checked');
+        formData.companyType = ct ? (ct.value === '其他' ? document.getElementById('companyTypeOther').value : ct.value) : '';
+        formData.establishedAt = document.getElementById('cDate').value;
+        formData.registeredAddress = document.getElementById('cRegAddr').value;
+        formData.officeAddress = document.getElementById('cOfficeAddr').value;
+      } else if (currentStep === 2) {
+        formData.contactPerson = {
+          name: document.getElementById('cpName').value,
+          phone: document.getElementById('cpPhone').value,
+          email: document.getElementById('cpEmail').value,
+          position: document.getElementById('cpPosition').value
+        };
+        formData.legalRepresentative = {
+          name: document.getElementById('lpName').value,
+          phone: document.getElementById('lpPhone').value,
+          idCard: document.getElementById('lpIdCard').value,
+          email: document.getElementById('lpEmail').value
+        };
+      } else if (currentStep === 3) {
+        formData.businessTypes = Array.from(document.querySelectorAll('input[name="bizType"]:checked')).map(function(c) { return c.value; });
+        formData.contentTypePreference = Array.from(document.querySelectorAll('input[name="contentPref"]:checked')).map(function(c) { return c.value; });
+        var gp = document.querySelector('input[name="genderPref"]:checked');
+        formData.genderPreference = gp ? gp.value : '';
+        formData.genreSpecialty = Array.from(document.querySelectorAll('input[name="genre"]:checked')).map(function(c) { return c.value; });
+        var hb = document.querySelector('input[name="hasBroadcast"]:checked');
+        formData.hasBroadcastLicense = hb ? hb.value === '有' : false;
+        formData.broadcastLicenseNo = document.getElementById('licenseNo').value;
+        formData.broadcastLicenseExpireAt = document.getElementById('licenseExpire').value;
+        var hn = document.querySelector('input[name="hasNetCulture"]:checked');
+        formData.hasNetCultureLicense = hn ? hn.value === '有' : false;
+        formData.otherQualifications = document.getElementById('otherQual').value;
+        var hw = document.querySelector('input[name="hasWorks"]:checked');
+        formData.hasPreviousWorks = hw ? hw.value === '是' : false;
+      }
+    }
+
+    function renderSummary() {
+      var sc = document.getElementById('summaryCompany');
+      sc.innerHTML = '<div class="summary-row"><span class="summary-label">企业名称</span><span class="summary-value">' + (formData.companyName || '—') + '</span></div>' +
+        '<div class="summary-row"><span class="summary-label">统一社会信用代码</span><span class="summary-value">' + (formData.unifiedSocialCode || '—') + '</span></div>' +
+        '<div class="summary-row"><span class="summary-label">企业类型</span><span class="summary-value">' + (formData.companyType || '—') + '</span></div>';
+
+      var sct = document.getElementById('summaryContact');
+      sct.innerHTML = '<div class="summary-row"><span class="summary-label">对接人</span><span class="summary-value">' + (formData.contactPerson ? formData.contactPerson.name : '—') + '</span></div>' +
+        '<div class="summary-row"><span class="summary-label">法人</span><span class="summary-value">' + (formData.legalRepresentative ? formData.legalRepresentative.name : '—') + '</span></div>';
+
+      var sb = document.getElementById('summaryBusiness');
+      sb.innerHTML = '<div class="summary-row"><span class="summary-label">合作业务</span><span class="summary-value">' + (formData.businessTypes ? formData.businessTypes.join('、') : '—') + '</span></div>' +
+        '<div class="summary-row"><span class="summary-label">擅长题材</span><span class="summary-value">' + (formData.genreSpecialty ? formData.genreSpecialty.join('、') : '—') + '</span></div>';
+    }
+
+    function nextStep() {
+      if (!validateStep(currentStep)) return;
+      collectStepData();
+      if (currentStep < totalSteps) {
+        currentStep++;
+        updateSteps();
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateSteps();
+      }
+    }
+
+    function goToStep(step) {
+      currentStep = step;
+      updateSteps();
+    }
+
+    function toggleSubmitBtn() {
+      document.getElementById('btnSubmit').disabled = !document.getElementById('agreeCheck').checked;
+    }
+
+    function submitForm() {
+      var appId = 'KH' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '001';
+      window.location.href = 'success.html?id=' + appId;
+    }
+
+    updateSteps();
+  </script>
+</body>
+</html>
