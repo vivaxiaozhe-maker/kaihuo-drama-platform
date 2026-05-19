@@ -54,17 +54,17 @@
 
       <!-- 列表 -->
       <div class="card">
-        <table class="table" id="onboardingTable">
+        <table class="table" id="onboardingTable" style="table-layout:fixed;width:100%">
           <thead>
             <tr>
-              <th>申请编号</th>
-              <th>企业名称</th>
-              <th style="width:160px">统一社会信用代码</th>
-              <th style="width:140px">合作业务类型</th>
-              <th style="width:140px">对接人</th>
-              <th style="width:160px">申请时间</th>
-              <th style="width:100px">审核状态</th>
-              <th style="width:140px">操作</th>
+              <th style="width:130px">申请编号</th>
+              <th style="width:auto">企业名称</th>
+              <th style="width:140px">统一社会信用代码</th>
+              <th style="width:120px">合作业务类型</th>
+              <th style="width:120px">对接人</th>
+              <th style="width:150px">申请时间</th>
+              <th style="width:90px">审核状态</th>
+              <th style="width:120px">操作</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -162,20 +162,20 @@
       tbody.innerHTML = list.map(function(a) {
         var s = statusMap[a.status] || statusMap.pending;
         var bizTags = a.businessTypes.map(function(t) {
-          return '<span class="tag-result" style="background:rgba(0,240,255,0.08);color:var(--neon-cyan);border:1px solid rgba(0,240,255,0.2);margin-right:4px;font-size:11px">' + t + '</span>';
+          return '<span class="tag-result" style="background:rgba(0,240,255,0.08);color:var(--neon-cyan);border:1px solid rgba(0,240,255,0.2);margin:0 2px 2px 0;font-size:11px;white-space:nowrap;display:inline-block">' + t + '</span>';
         }).join('');
         var canAudit = a.status === 'pending' || a.status === 'reviewing';
         return '<tr>' +
-          '<td style="font-family:Orbitron,sans-serif;font-size:13px">' + a.id + '</td>' +
-          '<td>' + a.companyName + '</td>' +
-          '<td>' + maskCode(a.unifiedSocialCode) + '</td>' +
+          '<td style="font-family:Orbitron,sans-serif;font-size:12px;white-space:nowrap">' + a.id + '</td>' +
+          '<td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0" title="' + a.companyName + '">' + a.companyName + '</td>' +
+          '<td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">' + maskCode(a.unifiedSocialCode) + '</td>' +
           '<td>' + bizTags + '</td>' +
-          '<td>' + a.contactPerson.name + '<br><span style="font-size:12px;color:var(--text-secondary)">' + a.contactPerson.phone + '</span></td>' +
-          '<td>' + a.createdAt + '</td>' +
-          '<td><span class="tag-result" style="background:' + s.color + '22;color:' + s.color + ';border:1px solid ' + s.color + '66">' + s.label + '</span></td>' +
-          '<td>' +
-            (canAudit ? '<button class="btn btn-sm btn-primary" onclick="openAuditModal(\'' + a.id + '\')">审核</button> ' : '') +
-            '<button class="btn btn-sm" style="color:var(--neon-cyan);border-color:rgba(0,240,255,0.3)" onclick="openDetailModal(\'' + a.id + '\')">详情</button>' +
+          '<td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">' + a.contactPerson.name + '<br><span style="font-size:12px;color:var(--text-secondary)">' + a.contactPerson.phone + '</span></td>' +
+          '<td style="white-space:nowrap;font-size:13px">' + a.createdAt + '</td>' +
+          '<td><span class="tag-result" style="background:' + s.color + '22;color:' + s.color + ';border:1px solid ' + s.color + '66;white-space:nowrap;font-size:12px">' + s.label + '</span></td>' +
+          '<td style="white-space:nowrap">' +
+            (canAudit ? '<button class="btn btn-sm btn-primary" style="padding:4px 10px;font-size:12px" onclick="openAuditModal(\'' + a.id + '\')">审核</button> ' : '') +
+            '<button class="btn btn-sm" style="padding:4px 10px;font-size:12px;color:var(--neon-cyan);border-color:rgba(0,240,255,0.3)" onclick="openDetailModal(\'' + a.id + '\')">详情</button>' +
           '</td>' +
         '</tr>';
       }).join('');
