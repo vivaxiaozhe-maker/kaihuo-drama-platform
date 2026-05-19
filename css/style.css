@@ -595,7 +595,8 @@ textarea.form-input {
 
 .radio-group {
   display: flex;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .radio-item {
@@ -607,6 +608,11 @@ textarea.form-input {
   border-radius: 8px;
   border: 1px solid var(--border-color);
   transition: all 0.3s;
+  flex: 1;
+  min-width: 110px;
+  max-width: 200px;
+  justify-content: center;
+  white-space: nowrap;
 }
 
 .radio-item:hover {
