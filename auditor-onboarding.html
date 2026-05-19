@@ -208,7 +208,7 @@
       var tabLabels = ['企业信息', '联系人', '业务能力'];
       var html = '<div style="display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border-color)">' +
         tabLabels.map(function(l, idx) {
-          return '<div class="tab-item' + (idx === 0 ? ' active' : '') + '" style="padding:10px 16px;border:none;margin:0" onclick="switchAuditTab(this,' + idx + ')">' + l + '</div>';
+          return '<div class="audit-tab-item' + (idx === 0 ? ' active' : '') + '" style="padding:10px 16px;cursor:pointer;color:var(--text-secondary);font-size:14px;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.3s;" onclick="switchAuditTab(this,' + idx + ')">' + l + '</div>';
         }).join('') + '</div>';
 
       // Tab1: 企业信息
@@ -357,8 +357,10 @@
     }
 
     function switchAuditTab(el, idx) {
-      document.querySelectorAll('#auditBody .tab-item').forEach(function(t) { t.classList.remove('active'); });
-      el.classList.add('active');
+      document.querySelectorAll('.audit-tab-item').forEach(function(t) { t.style.color = 'var(--text-secondary)'; t.style.borderBottomColor = 'transparent'; t.style.textShadow = 'none'; });
+      el.style.color = 'var(--neon-cyan)';
+      el.style.borderBottomColor = 'var(--neon-cyan)';
+      el.style.textShadow = '0 0 10px rgba(0, 240, 255, 0.5)';
       document.querySelectorAll('.audit-tab').forEach(function(t) { t.style.display = 'none'; });
       document.querySelector('.audit-tab[data-idx="' + idx + '"]').style.display = 'block';
     }
